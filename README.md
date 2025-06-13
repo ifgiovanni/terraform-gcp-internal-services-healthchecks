@@ -42,33 +42,29 @@ This Terraform module configures **Uptime Checks** and **Alert Policies** for in
 ## Usage
 
 ```terraform
-module "internal_services_healthchecks" {
-  source = "./modules/internal-services-healthchecks"
+module "internal-services-healthchecks" {
+  source  = "ifgiovanni/internal-services-healthchecks/gcp"
+  version = "0.0.1"
 
   project                     = "my-gcp-project"
   location                    = "us-central1"
   uptime_defaults.selected_regions = ["usa-iowa", "usa-oregon", "usa-virginia"]
   notification_channels       = ["projects/my-gcp-project/notificationChannels/123456"]
-  alerting_services = {
-    service1 = {
-      namespace_id = "namespace1"
-      service_id   = "service1"
-      endpoints    = [
-        {
-          port = 8080
-        }
-      ]
+  services_flat = [
+    {
+      namespace   = "databases"
+      service_id  = "redis-svc"
+      endpoint_id = "redis-svc-container"
+      address     = "127.0.0.1"
+      port        = 6380
+      metadata = {
+        stage   = "prod"
+        region  = "us-east1"
+        vm      = "loki"
+      }
+      network = "projects/my-gcp-project/locations/global/networks/vpc-example"
     }
-    service2 = {
-      namespace_id = "namespace2"
-      service_id   = "service2"
-      endpoints    = [
-        {
-          port = 9090
-        }
-      ]
-    }
-  }
+  ]
 }
 
 ---
